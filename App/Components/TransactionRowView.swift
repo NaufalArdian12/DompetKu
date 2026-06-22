@@ -7,11 +7,17 @@ struct TransactionRowView: View {
     // Optional setting for background color to adapt between List and normal VStack
     var isListRow: Bool = false
     
+    private var formattedDate: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd MMM yyyy"
+        return formatter.string(from: transaction.date)
+    }
+    
     var body: some View {
         HStack(spacing: 16) {
             // Icon
             Circle()
-                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                .stroke(Color(white: 0.85), lineWidth: 1)
                 .frame(width: 44, height: 44)
                 .background(Circle().fill(Color.white))
                 .overlay(
@@ -24,10 +30,10 @@ struct TransactionRowView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(transaction.category)
                     .font(.subheadline)
-                    .fontWeight(.semibold)
+                    .fontWeight(.bold)
                     .foregroundStyle(.black)
                 
-                Text(transaction.date.formatted(date: .abbreviated, time: .omitted))
+                Text(formattedDate)
                     .font(.caption)
                     .foregroundStyle(.gray)
             }
@@ -36,23 +42,26 @@ struct TransactionRowView: View {
             
             // Amount
             VStack(alignment: .trailing, spacing: 4) {
-                Text((transaction.type == .income ? "+" : "-") + transaction.formattedAmount)
+                Text((transaction.type == .income ? "+" : "") + (transaction.type == .expense ? "-" : "") + transaction.formattedAmount)
                     .font(.subheadline)
                     .fontWeight(.bold)
-                    .foregroundStyle(transaction.type == .income ? AppTheme.income : AppTheme.expense)
+                    .foregroundStyle(transaction.type == .income ? AppTheme.primary : AppTheme.expense)
                 
                 Text("Success")
                     .font(.caption)
                     .foregroundStyle(.gray)
             }
         }
-        .padding(.vertical, isListRow ? 8 : 12)
-        .padding(.horizontal, isListRow ? 0 : 16)
+        .padding(.vertical, isListRow ? 8 : 16)
+        .padding(.horizontal, isListRow ? 0 : 20)
         .background(
             VStack {
                 Spacer()
                 if showDivider {
-                    Divider().padding(.leading, 76)
+                    Divider()
+                        .background(Color(white: 0.9))
+                        .padding(.leading, 80)
+                        .padding(.trailing, 20)
                 }
             }
         )

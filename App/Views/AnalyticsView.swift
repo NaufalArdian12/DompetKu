@@ -67,6 +67,7 @@ struct AnalyticsView: View {
                             Text("Distribusi " + selectedFilter.rawValue)
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
+                                .padding(.top, 8)
                             
                             ZStack {
                                 Chart(categoryData) { item in
@@ -78,19 +79,18 @@ struct AnalyticsView: View {
                                     .cornerRadius(6)
                                     .foregroundStyle(item.color)
                                 }
+                                .animation(.spring(response: 0.5, dampingFraction: 0.8), value: selectedFilter)
                                 .frame(height: 220)
                                 
                                 VStack(spacing: 2) {
-                                    Text("Total")
-                                        .font(.caption2)
+                                    Text("TOTAL")
+                                        .font(.system(size: 10, weight: .semibold))
                                         .foregroundStyle(.secondary)
-                                        .textCase(.uppercase)
                                     Text(totalForSelectedType.formattedRupiah)
                                         .font(.system(size: 18, weight: .bold, design: .rounded))
                                         .contentTransition(.numericText())
                                 }
                             }
-                            .animation(.spring(response: 0.5, dampingFraction: 0.8), value: selectedFilter)
                         }
                         .padding()
                         .background(AppTheme.bgCard)
@@ -102,68 +102,82 @@ struct AnalyticsView: View {
                         VStack(alignment: .leading, spacing: 16) {
                             Text("Detail Kategori")
                                 .font(.headline)
+                                .fontWeight(.bold)
                                 .padding(.horizontal)
                             
                             VStack(spacing: 0) {
                                 ForEach(categoryData) { data in
                                     let percentage = (data.amount / totalForSelectedType) * 100
                                     
-                                    HStack(spacing: 12) {
+                                    HStack(spacing: 16) {
                                         Circle()
                                             .fill(data.color.opacity(0.12))
-                                            .frame(width: 40, height: 40)
+                                            .frame(width: 44, height: 44)
                                             .overlay(
                                                 Image(systemName: AppTheme.categoryIcon(for: data.category))
-                                                    .font(.footnote)
+                                                    .font(.system(size: 16, weight: .semibold))
                                                     .foregroundStyle(data.color)
                                             )
                                         
-                                        VStack(alignment: .leading, spacing: 4) {
-                                            Text(data.category)
-                                                .font(.subheadline)
-                                                .fontWeight(.semibold)
+                                        VStack(alignment: .leading, spacing: 8) {
+                                            HStack(alignment: .bottom) {
+                                                Text(data.category)
+                                                    .font(.subheadline)
+                                                    .fontWeight(.bold)
+                                                
+                                                Spacer()
+                                                
+                                                Text(data.amount.formattedRupiah)
+                                                    .font(.subheadline)
+                                                    .fontWeight(.bold)
+                                            }
                                             
-                                            ProgressView(value: percentage, total: 100)
-                                                .tint(data.color)
-                                                .scaleEffect(x: 1, y: 1.5, anchor: .center)
-                                        }
-                                        
-                                        Spacer()
-                                        
-                                        VStack(alignment: .trailing, spacing: 4) {
-                                            Text(data.amount.formattedRupiah)
-                                                .font(.subheadline)
-                                                .fontWeight(.bold)
-                                            Text(String(format: "%.1f%%", percentage))
-                                                .font(.caption2)
-                                                .foregroundStyle(.secondary)
+                                            HStack(spacing: 8) {
+                                                // Custom Progress Bar
+                                                GeometryReader { geometry in
+                                                    ZStack(alignment: .leading) {
+                                                        Capsule()
+                                                            .fill(Color(white: 0.9))
+                                                            .frame(height: 6)
+                                                        
+                                                        Capsule()
+                                                            .fill(data.color)
+                                                            .frame(width: max(0, geometry.size.width * CGFloat(percentage / 100)), height: 6)
+                                                    }
+                                                }
+                                                .frame(height: 6)
+                                                
+                                                Text(String(format: "%.1f%%", percentage))
+                                                    .font(.system(size: 10))
+                                                    .foregroundStyle(.gray)
+                                            }
                                         }
                                     }
-                                    .padding(.vertical, 12)
-                                    .padding(.horizontal)
+                                    .padding(.vertical, 16)
+                                    .padding(.horizontal, 20)
                                     
                                     if data.id != categoryData.last?.id {
-                                        Divider().padding(.leading, 64)
+                                        Divider()
+                                            .background(Color(white: 0.9))
+                                            .padding(.leading, 80)
+                                            .padding(.trailing, 20)
                                     }
                                 }
                             }
                             .background(AppTheme.bgCard)
-                            .cornerRadius(16)
-                            .shadow(color: .black.opacity(0.02), radius: 6, x: 0, y: 3)
+                            .cornerRadius(20)
+                            .shadow(color: .black.opacity(0.02), radius: 8, x: 0, y: 4)
                             .padding(.horizontal)
+                            .padding(.bottom, 120) // padding for floating tab bar
                         }
                     }
                 }
-                .padding(.vertical)
+                .padding(.top, 24)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .scrollContentBackground(.hidden)
             .background(AppTheme.bgMain)
-            .navigationTitle("Analisis")
-            // SwiftUI-native navigation bar background for iOS 17+ / iOS 26
-            #if os(iOS)
-            .toolbarBackground(AppTheme.bgMain, for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
-            #endif
+            .navigationBarHidden(true)
         }
     }
 }

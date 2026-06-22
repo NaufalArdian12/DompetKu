@@ -40,59 +40,69 @@ struct TransactionListView: View {
     
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                CustomSegmentedPicker(
-                    options: FilterType.allCases,
-                    title: { $0.rawValue },
-                    selection: $selectedFilter
-                )
-                .padding()
-                .background(AppTheme.bgMain)
-                
-                // Transactions List
-                if filteredTransactions.isEmpty {
-                    EmptyStateView(
-                        iconName: "magnifyingglass",
-                        title: "Tidak ada transaksi ditemukan",
-                        message: "Coba cari kata kunci lain atau ubah filter."
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    // Header
+                    Text("Riwayat Catatan")
+                        .font(.system(size: 32, weight: .bold))
+                        .foregroundStyle(.black)
+                        .padding(.horizontal)
+                        .padding(.top, 24)
+                    
+                    // Custom Search Bar
+                    HStack(spacing: 8) {
+                        Image(systemName: "magnifyingglass")
+                            .foregroundStyle(.gray)
+                        TextField("Cari kategori atau catatan...", text: $searchText)
+                            .foregroundStyle(.black)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                    .background(Color(white: 0.92)) // Light gray pill
+                    .clipShape(Capsule())
+                    .padding(.horizontal)
+                    
+                    // Segmented Picker
+                    CustomSegmentedPicker(
+                        options: FilterType.allCases,
+                        title: { $0.rawValue },
+                        selection: $selectedFilter
                     )
-                    .background(AppTheme.bgMain)
-                    .background(AppTheme.bgMain)
-                } else {
-                    List {
-                        ForEach(filteredTransactions) { transaction in
-                            TransactionRowView(
-                                transaction: transaction,
-                                showDivider: false, // List style provides its own separators if needed, or we use cards
-                                isListRow: true
-                            )
-                            .listRowBackground(AppTheme.bgCard)
-                        }
-                        .onDelete { offsets in
-                            if let index = offsets.first {
-                                transactionToDelete = filteredTransactions[index]
-                                showingDeleteAlert = true
+                    .padding(.horizontal)
+                    
+                    // Transactions Card
+                    if filteredTransactions.isEmpty {
+                        EmptyStateView(
+                            iconName: "magnifyingglass",
+                            title: "Tidak ada transaksi ditemukan",
+                            message: "Coba cari kata kunci lain atau ubah filter."
+                        )
+                        .padding(.top, 40)
+                    } else {
+                        VStack(spacing: 0) {
+                            ForEach(filteredTransactions) { transaction in
+                                TransactionRowView(
+                                    transaction: transaction,
+                                    showDivider: transaction.id != filteredTransactions.last?.id,
+                                    isListRow: false
+                                )
+                                .swipeToDelete {
+                                    transactionToDelete = transaction
+                                    showingDeleteAlert = true
+                                }
                             }
                         }
+                        .background(AppTheme.bgCard)
+                        .cornerRadius(20)
+                        .shadow(color: .black.opacity(0.02), radius: 8, x: 0, y: 4)
+                        .padding(.horizontal)
+                        .padding(.bottom, 120) // padding for floating tab bar
                     }
-                    #if os(iOS)
-                    .listStyle(.insetGrouped)
-                    #else
-                    .listStyle(.inset)
-                    #endif
-                    .scrollContentBackground(.hidden)
-                    .background(AppTheme.bgMain)
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(AppTheme.bgMain)
-            .navigationTitle("Riwayat Catatan")
-            // SwiftUI-native navigation bar background for iOS 17+ / iOS 26
-            #if os(iOS)
-            .toolbarBackground(AppTheme.bgMain, for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
-            #endif
-            .searchable(text: $searchText, prompt: "Cari kategori atau catatan...")
+            .navigationBarHidden(true)
             .alert("Hapus Transaksi", isPresented: $showingDeleteAlert, presenting: transactionToDelete) { transaction in
                 Button("Hapus", role: .destructive) {
                     modelContext.delete(transaction)
