@@ -5,7 +5,7 @@ import SwiftData
 final class Transaction {
     var id: UUID
     var amount: Double
-    var typeString: String // "income" or "expense"
+    var typeString: String = "expense" // "income" or "expense"
     var category: String
     var date: Date
     var note: String
