@@ -182,28 +182,6 @@ struct DashboardView: View {
             #if os(iOS)
             .navigationBarHidden(true)
             #endif
-            .toolbar {
-                #if os(iOS)
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button(action: { showingAddSheet = true }) {
-                        Image(systemName: "plus.circle.fill")
-                            .font(.title2)
-                            .foregroundStyle(AppTheme.primary)
-                    }
-                }
-                #else
-                ToolbarItem(placement: .primaryAction) {
-                    Button(action: { showingAddSheet = true }) {
-                        Image(systemName: "plus.circle.fill")
-                            .font(.title2)
-                            .foregroundStyle(AppTheme.primary)
-                    }
-                }
-                #endif
-            }
-            .sheet(isPresented: $showingAddSheet) {
-                AddTransactionView()
-            }
             .alert("Hapus Transaksi", isPresented: $showingDeleteAlert, presenting: transactionToDelete) { transaction in
                 Button("Hapus", role: .destructive) {
                     modelContext.delete(transaction)

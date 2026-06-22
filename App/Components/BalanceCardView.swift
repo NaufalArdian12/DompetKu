@@ -17,16 +17,6 @@ struct BalanceCardView: View {
                         .foregroundStyle(.white)
                         .lineLimit(1).minimumScaleFactor(0.6)
                         .frame(maxWidth: .infinity)
-                    
-                    HStack {
-                        Spacer()
-                        Button(action: onAddTransaction) {
-                            Image(systemName: "plus.circle.fill")
-                                .font(.system(size: 28))
-                                .foregroundStyle(.white)
-                        }
-                    }
-                    .padding(.trailing, 24)
                 }
                 .padding(.top, 128) // Increased top padding to clear the notch/dynamic island
             }
