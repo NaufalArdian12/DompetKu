@@ -8,6 +8,8 @@ struct AddTransactionView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     
+    @Query(sort: \TransactionCategory.name) private var allCategories: [TransactionCategory]
+    
     @State private var amountString = ""
     @State private var selectedType: TransactionType = .expense
     @State private var selectedCategory = "Makanan"
@@ -15,11 +17,8 @@ struct AddTransactionView: View {
     @State private var note = ""
     @FocusState private var isAmountFocused: Bool
     
-    let expenseCategories = ["Makanan", "Belanja", "Hiburan", "Tagihan", "Transportasi", "Lainnya"]
-    let incomeCategories = ["Gaji", "Investasi", "Bonus", "Sampingan", "Lainnya"]
-    
-    var categories: [String] {
-        selectedType == .expense ? expenseCategories : incomeCategories
+    var categories: [TransactionCategory] {
+        allCategories.filter { $0.type == selectedType }
     }
     
     private var parsedAmount: Double? {
@@ -141,27 +140,28 @@ struct AddTransactionView: View {
         .padding(.horizontal)
     }
     
-    private func categoryButton(for category: String) -> some View {
-        let isSelected = selectedCategory == category
+    private func categoryButton(for category: TransactionCategory) -> some View {
+        let isSelected = selectedCategory == category.name
+        let catColor = Color(hex: category.colorHex) ?? AppTheme.primary
         
         return Button {
             withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) {
-                selectedCategory = category
+                selectedCategory = category.name
             }
         } label: {
             VStack(spacing: 8) {
-                Image(systemName: AppTheme.categoryIcon(for: category))
+                Image(systemName: category.iconName)
                     .font(.system(size: 18, weight: .semibold))
-                    .foregroundStyle(isSelected ? .white : AppTheme.primary)
+                    .foregroundStyle(isSelected ? .white : catColor)
                     .frame(width: 40, height: 40)
                     .background(
                         Circle()
-                            .fill(isSelected ? AppTheme.primary : AppTheme.bgBlueSoft)
+                            .fill(isSelected ? catColor : catColor.opacity(0.15))
                     )
                 
-                Text(category)
+                Text(category.name)
                     .font(.caption.weight(isSelected ? .bold : .medium))
-                    .foregroundStyle(isSelected ? AppTheme.primary : .secondary)
+                    .foregroundStyle(isSelected ? catColor : .secondary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
             }
@@ -170,10 +170,10 @@ struct AddTransactionView: View {
             .background(AppTheme.bgCard)
             .overlay(
                 RoundedRectangle(cornerRadius: 14)
-                    .stroke(isSelected ? AppTheme.primary : Color.clear, lineWidth: 1.5)
+                    .stroke(isSelected ? catColor : Color.clear, lineWidth: 1.5)
             )
             .clipShape(RoundedRectangle(cornerRadius: 14))
-            .shadow(color: isSelected ? AppTheme.primary.opacity(0.12) : .black.opacity(0.03), radius: 8, x: 0, y: 4)
+            .shadow(color: isSelected ? catColor.opacity(0.12) : .black.opacity(0.03), radius: 8, x: 0, y: 4)
         }
         .buttonStyle(.plain)
     }

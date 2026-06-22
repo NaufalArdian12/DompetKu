@@ -4,6 +4,7 @@ import Charts
 
 struct AnalyticsView: View {
     @Query private var transactions: [Transaction]
+    @Query private var allCategories: [TransactionCategory]
     @State private var selectedFilter: FilterType = .all
     
     enum FilterType: String, CaseIterable {
@@ -33,10 +34,15 @@ struct AnalyticsView: View {
         
         return grouped.map { (key, value) in
             let amount = value.reduce(0) { $0 + $1.amount }
+            let dbCat = allCategories.first { $0.name == key }
+            let color = dbCat.flatMap { Color(hex: $0.colorHex) } ?? AppTheme.categoryColor(for: key)
+            let icon = dbCat?.iconName ?? AppTheme.categoryIcon(for: key)
+            
             return CategoryData(
                 category: key,
                 amount: amount,
-                color: AppTheme.categoryColor(for: key)
+                color: color,
+                iconName: icon
             )
         }.sorted { $0.amount > $1.amount }
     }
@@ -121,7 +127,7 @@ struct AnalyticsView: View {
                                             .fill(data.color.opacity(0.12))
                                             .frame(width: 44, height: 44)
                                             .overlay(
-                                                Image(systemName: AppTheme.categoryIcon(for: data.category))
+                                                Image(systemName: data.iconName)
                                                     .font(.system(size: 16, weight: .semibold))
                                                     .foregroundStyle(data.color)
                                             )
@@ -194,4 +200,5 @@ struct CategoryData: Identifiable, Equatable {
     let category: String
     let amount: Double
     let color: Color
+    let iconName: String
 }
