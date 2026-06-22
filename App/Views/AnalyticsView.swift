@@ -44,7 +44,14 @@ struct AnalyticsView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 24) {
+                VStack(alignment: .leading, spacing: 20) {
+                    // Header
+                    Text("Analisis")
+                        .font(.system(size: 32, weight: .bold))
+                        .foregroundStyle(.black)
+                        .padding(.horizontal)
+                        .padding(.top, 24)
+                    
                     // Segmented Picker
                     CustomSegmentedPicker(
                         options: FilterType.allCases,
