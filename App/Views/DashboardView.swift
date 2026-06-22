@@ -12,7 +12,15 @@ struct DashboardView: View {
     @State private var transactionToDelete: Transaction?
     @State private var showingDeleteAlert = false
     
+    @AppStorage("monthlyBudget") private var monthlyBudget: Double = 0.0
+    
     // Financial Calculations
+    private var currentMonthExpense: Double {
+        let calendar = Calendar.current
+        let now = Date()
+        let startOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: now)) ?? now
+        return transactions.filter { $0.type == .expense && $0.date >= startOfMonth }.reduce(0) { $0 + $1.amount }
+    }
     private var totalIncome: Double {
         transactions.filter { $0.type == .income }.reduce(0) { $0 + $1.amount }
     }
@@ -58,6 +66,46 @@ struct DashboardView: View {
                             showingAddSheet = true
                         }
                     )
+                    
+                    // Budget Section
+                    if monthlyBudget > 0 {
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack {
+                                Text("Anggaran Bulan Ini")
+                                    .font(.headline.weight(.bold))
+                                    .foregroundStyle(.black)
+                                Spacer()
+                                Text(currentMonthExpense.formattedRupiah + " / " + monthlyBudget.formattedRupiah)
+                                    .font(.caption.weight(.medium))
+                                    .foregroundStyle(.secondary)
+                            }
+                            
+                            GeometryReader { geometry in
+                                ZStack(alignment: .leading) {
+                                    Capsule()
+                                        .fill(Color.gray.opacity(0.2))
+                                        .frame(height: 12)
+                                    
+                                    Capsule()
+                                        .fill(currentMonthExpense > monthlyBudget ? Color.red : AppTheme.primary)
+                                        .frame(width: min(geometry.size.width * CGFloat(currentMonthExpense / monthlyBudget), geometry.size.width), height: 12)
+                                        .animation(.spring(response: 0.5, dampingFraction: 0.8), value: currentMonthExpense)
+                                }
+                            }
+                            .frame(height: 12)
+                            
+                            if currentMonthExpense > monthlyBudget {
+                                Text("Peringatan: Pengeluaran bulan ini telah melewati batas!")
+                                    .font(.caption2)
+                                    .foregroundStyle(.red)
+                            }
+                        }
+                        .padding()
+                        .background(AppTheme.bgCard)
+                        .cornerRadius(20)
+                        .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 5)
+                        .padding(.horizontal)
+                    }
                     
                     // Chart Section (7 Days Trend)
                     VStack(alignment: .leading, spacing: 12) {
