@@ -8,12 +8,22 @@ struct SwipeToDeleteModifier: ViewModifier {
     func body(content: Content) -> some View {
         ZStack(alignment: .trailing) {
             // Delete Background and Icon
-            Color.red
-            
-            Image(systemName: "trash")
-                .font(.title3)
-                .foregroundStyle(.white)
-                .padding(.trailing, 24)
+            HStack {
+                Spacer()
+                VStack(spacing: 4) {
+                    Circle()
+                        .fill(Color.red)
+                        .frame(width: 44, height: 44)
+                        .overlay(
+                            Image(systemName: "trash")
+                                .foregroundStyle(.white)
+                        )
+                    Text("Delete")
+                        .font(.system(size: 10))
+                        .foregroundStyle(.gray)
+                }
+                .frame(width: 80)
+            }
             
             // Content
             content

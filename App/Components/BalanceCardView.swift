@@ -11,32 +11,31 @@ struct BalanceCardView: View {
             // Top Blue Header
             VStack(spacing: 20) {
                 // Balance Section
-                ZStack(alignment: .topTrailing) {
-                    VStack(spacing: 8) {
-                        Text("Total Saldo Anda")
-                            .font(.subheadline)
-                            .foregroundStyle(.white.opacity(0.9))
-                        Text(currentBalance.formattedRupiah)
-                            .font(.system(size: 36, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white)
-                            .lineLimit(1).minimumScaleFactor(0.6)
-                    }
-                    .frame(maxWidth: .infinity)
+                ZStack(alignment: .top) {
+                    Text("Rp 1.980.000") // Placeholder that gets replaced or just formatted
+                        .font(.system(size: 42, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .lineLimit(1).minimumScaleFactor(0.6)
+                        .padding(.top, 64)
                     
+                    HStack {
+                        Spacer()
                         Button(action: onAddTransaction) {
-                        Image(systemName: "plus.circle.fill")
-                            .font(.system(size: 28))
-                            .foregroundStyle(.white)
+                            Image(systemName: "plus.circle.fill")
+                                .font(.system(size: 28))
+                                .foregroundStyle(.white)
+                                .background(Circle().fill(Color.blue))
+                        }
                     }
+                    .padding(.top, 64)
                     .padding(.trailing, 24)
                 }
-                .padding(.top, 128) // Increased top padding to clear the notch/dynamic island
             }
-            .padding(.bottom, 100) // Extra padding for the overlapping card
+            .padding(.bottom, 80) // Extra padding for the overlapping card
             .frame(maxWidth: .infinity)
             .background(
                 LinearGradient(
-                    colors: [AppTheme.primary, AppTheme.bgMain],
+                    colors: [Color(red: 0.6, green: 0.75, blue: 1.0), Color(white: 0.95)],
                     startPoint: .top,
                     endPoint: .bottom
                 )
@@ -45,10 +44,12 @@ struct BalanceCardView: View {
             // Overlapping Income/Expense Card
             VStack(spacing: 16) {
                 HStack {
-                    HStack(spacing: 8) {
-                        Image(systemName: "arrow.down.left.circle.fill")
-                            .font(.title3)
-                            .foregroundStyle(AppTheme.income)
+                    HStack(spacing: 12) {
+                        Circle()
+                            .fill(Color.blue)
+                            .frame(width: 28, height: 28)
+                            .overlay(Image(systemName: "arrow.down.left").font(.caption).fontWeight(.bold).foregroundStyle(.white))
+                        
                         Text("Pemasukan")
                             .font(.subheadline)
                             .foregroundStyle(.black)
@@ -60,10 +61,12 @@ struct BalanceCardView: View {
                 }
                 
                 HStack {
-                    HStack(spacing: 8) {
-                        Image(systemName: "arrow.up.right.circle.fill")
-                            .font(.title3)
-                            .foregroundStyle(AppTheme.expense)
+                    HStack(spacing: 12) {
+                        Circle()
+                            .fill(Color.orange)
+                            .frame(width: 28, height: 28)
+                            .overlay(Image(systemName: "arrow.up.right").font(.caption).fontWeight(.bold).foregroundStyle(.white))
+                        
                         Text("Pengeluaran")
                             .font(.subheadline)
                             .foregroundStyle(.black)
@@ -74,7 +77,7 @@ struct BalanceCardView: View {
                         .foregroundStyle(.black)
                 }
             }
-            .padding(20)
+            .padding(24)
             .background(Color.white)
             .clipShape(RoundedRectangle(cornerRadius: 20))
             .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 5)
