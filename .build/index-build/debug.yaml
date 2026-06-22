@@ -1,0 +1,47 @@
+client:
+  name: basic
+  file-system: device-agnostic
+tools: {}
+targets:
+  "Dompetku-arm64-apple-macosx-debug.module": ["<Dompetku-arm64-apple-macosx-debug.module>"]
+  "PackageStructure": ["<PackageStructure>"]
+  "main": ["<Dompetku-arm64-apple-macosx-debug.module>"]
+  "test": ["<Dompetku-arm64-apple-macosx-debug.module>"]
+default: "main"
+nodes:
+  "/Users/macbook/Documents/Ngulik/IosApp/App/":
+    is-directory-structure: true
+    content-exclusion-patterns: [".git",".build"]
+commands:
+  "/Users/macbook/Documents/Ngulik/IosApp/.build/index-build/arm64-apple-macosx/debug/Dompetku.build/sources":
+    tool: write-auxiliary-file
+    inputs: ["<sources-file-list>","/Users/macbook/Documents/Ngulik/IosApp/App/App.swift","/Users/macbook/Documents/Ngulik/IosApp/App/Components/BalanceCardView.swift","/Users/macbook/Documents/Ngulik/IosApp/App/Components/CustomSegmentedPicker.swift","/Users/macbook/Documents/Ngulik/IosApp/App/Components/EmptyStateView.swift","/Users/macbook/Documents/Ngulik/IosApp/App/Components/SwipeToDeleteModifier.swift","/Users/macbook/Documents/Ngulik/IosApp/App/Components/TransactionRowView.swift","/Users/macbook/Documents/Ngulik/IosApp/App/Extensions/Double+Extension.swift","/Users/macbook/Documents/Ngulik/IosApp/App/Models/Transaction.swift","/Users/macbook/Documents/Ngulik/IosApp/App/Theme/AppTheme.swift","/Users/macbook/Documents/Ngulik/IosApp/App/Views/AddTransactionView.swift","/Users/macbook/Documents/Ngulik/IosApp/App/Views/AnalyticsView.swift","/Users/macbook/Documents/Ngulik/IosApp/App/Views/ContentView.swift","/Users/macbook/Documents/Ngulik/IosApp/App/Views/DashboardView.swift","/Users/macbook/Documents/Ngulik/IosApp/App/Views/TransactionListView.swift"]
+    outputs: ["/Users/macbook/Documents/Ngulik/IosApp/.build/index-build/arm64-apple-macosx/debug/Dompetku.build/sources"]
+    description: "Write auxiliary file /Users/macbook/Documents/Ngulik/IosApp/.build/index-build/arm64-apple-macosx/debug/Dompetku.build/sources"
+
+  "/Users/macbook/Documents/Ngulik/IosApp/.build/index-build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt":
+    tool: write-auxiliary-file
+    inputs: ["<swift-get-version>","/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"]
+    outputs: ["/Users/macbook/Documents/Ngulik/IosApp/.build/index-build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"]
+    always-out-of-date: "true"
+    description: "Write auxiliary file /Users/macbook/Documents/Ngulik/IosApp/.build/index-build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+
+  "<Dompetku-arm64-apple-macosx-debug.module>":
+    tool: phony
+    inputs: ["/Users/macbook/Documents/Ngulik/IosApp/.build/index-build/arm64-apple-macosx/debug/Modules/Dompetku.swiftmodule"]
+    outputs: ["<Dompetku-arm64-apple-macosx-debug.module>"]
+
+  "C.Dompetku-arm64-apple-macosx-debug.module":
+    tool: shell
+    inputs: ["/Users/macbook/Documents/Ngulik/IosApp/App/App.swift","/Users/macbook/Documents/Ngulik/IosApp/App/Components/BalanceCardView.swift","/Users/macbook/Documents/Ngulik/IosApp/App/Components/CustomSegmentedPicker.swift","/Users/macbook/Documents/Ngulik/IosApp/App/Components/EmptyStateView.swift","/Users/macbook/Documents/Ngulik/IosApp/App/Components/SwipeToDeleteModifier.swift","/Users/macbook/Documents/Ngulik/IosApp/App/Components/TransactionRowView.swift","/Users/macbook/Documents/Ngulik/IosApp/App/Extensions/Double+Extension.swift","/Users/macbook/Documents/Ngulik/IosApp/App/Models/Transaction.swift","/Users/macbook/Documents/Ngulik/IosApp/App/Theme/AppTheme.swift","/Users/macbook/Documents/Ngulik/IosApp/App/Views/AddTransactionView.swift","/Users/macbook/Documents/Ngulik/IosApp/App/Views/AnalyticsView.swift","/Users/macbook/Documents/Ngulik/IosApp/App/Views/ContentView.swift","/Users/macbook/Documents/Ngulik/IosApp/App/Views/DashboardView.swift","/Users/macbook/Documents/Ngulik/IosApp/App/Views/TransactionListView.swift","/Users/macbook/Documents/Ngulik/IosApp/.build/index-build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt","/Users/macbook/Documents/Ngulik/IosApp/.build/index-build/arm64-apple-macosx/debug/Dompetku.build/sources"]
+    outputs: ["/Users/macbook/Documents/Ngulik/IosApp/.build/index-build/arm64-apple-macosx/debug/Modules/Dompetku.swiftmodule"]
+    description: "Compiling Swift Module 'Dompetku' (14 sources)"
+    args: ["/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc","-module-name","Dompetku","-emit-dependencies","-emit-module","-emit-module-path","/Users/macbook/Documents/Ngulik/IosApp/.build/index-build/arm64-apple-macosx/debug/Modules/Dompetku.swiftmodule","-output-file-map","/Users/macbook/Documents/Ngulik/IosApp/.build/index-build/arm64-apple-macosx/debug/Dompetku.build/output-file-map.json","-parse-as-library","-incremental","@/Users/macbook/Documents/Ngulik/IosApp/.build/index-build/arm64-apple-macosx/debug/Dompetku.build/sources","-I","/Users/macbook/Documents/Ngulik/IosApp/.build/index-build/arm64-apple-macosx/debug/Modules","-target","arm64-apple-macosx14.0","-incremental","-enable-batch-mode","-serialize-diagnostics","-Onone","-enable-testing","-j8","-DSWIFT_PACKAGE","-DDEBUG","-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE","-module-cache-path","/Users/macbook/Documents/Ngulik/IosApp/.build/index-build/arm64-apple-macosx/debug/ModuleCache","-parseable-output","-parse-as-library","-emit-objc-header","-emit-objc-header-path","/Users/macbook/Documents/Ngulik/IosApp/.build/index-build/arm64-apple-macosx/debug/Dompetku.build/include/Dompetku-Swift.h","-swift-version","5","-Xfrontend","-experimental-lazy-typecheck","-Xfrontend","-experimental-skip-all-function-bodies","-Xfrontend","-experimental-allow-module-with-compiler-errors","-Xfrontend","-empty-abi-descriptor","-plugin-path","/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing","-sdk","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk","-F","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks","-I","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib","-L","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib","-g","-Xcc","-isysroot","-Xcc","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk","-Xcc","-F","-Xcc","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks","-Xcc","-fPIC","-Xcc","-g","-package-name","iosapp"]
+
+  "PackageStructure":
+    tool: package-structure-tool
+    inputs: ["/Users/macbook/Documents/Ngulik/IosApp/App/","/Users/macbook/Documents/Ngulik/IosApp/Package.swift","/Users/macbook/Documents/Ngulik/IosApp/Package.resolved"]
+    outputs: ["<PackageStructure>"]
+    description: "Planning build"
+    allow-missing-inputs: true
+

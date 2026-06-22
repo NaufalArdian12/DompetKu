@@ -1,0 +1,22 @@
+name: Dompetku
+options:
+  bundleIdPrefix: com.ngulik
+  minimumXcodeGenVersion: 2.0.0
+
+targets:
+  Dompetku:
+    type: application
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: App
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.ngulik.dompetku
+        SWIFT_VERSION: "5.9"
+        GENERATE_INFOPLIST_FILE: true
+        # This tells Xcode to automatically generate the default UILaunchScreen dictionary in Info.plist.
+        # This acts as the app's launch screen, pulling it out of Compatibility Mode (which causes black bars).
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationPortrait"
+        INFOPLIST_KEY_UIRequiresFullScreen: true
