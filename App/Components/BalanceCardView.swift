@@ -11,12 +11,12 @@ struct BalanceCardView: View {
             // Top Blue Header
             VStack(spacing: 20) {
                 // Balance Section
-                ZStack(alignment: .top) {
-                    Text("Rp 1.980.000") // Placeholder that gets replaced or just formatted
-                        .font(.system(size: 42, weight: .bold, design: .rounded))
+                ZStack(alignment: .center) {
+                    Text(currentBalance.formattedRupiah)
+                        .font(.system(size: 40, weight: .bold, design: .rounded))
                         .foregroundStyle(.white)
                         .lineLimit(1).minimumScaleFactor(0.6)
-                        .padding(.top, 64)
+                        .frame(maxWidth: .infinity)
                     
                     HStack {
                         Spacer()
@@ -24,18 +24,17 @@ struct BalanceCardView: View {
                             Image(systemName: "plus.circle.fill")
                                 .font(.system(size: 28))
                                 .foregroundStyle(.white)
-                                .background(Circle().fill(Color.blue))
                         }
                     }
-                    .padding(.top, 64)
                     .padding(.trailing, 24)
                 }
+                .padding(.top, 128) // Increased top padding to clear the notch/dynamic island
             }
-            .padding(.bottom, 80) // Extra padding for the overlapping card
+            .padding(.bottom, 100) // Extra padding for the overlapping card
             .frame(maxWidth: .infinity)
             .background(
                 LinearGradient(
-                    colors: [Color(red: 0.6, green: 0.75, blue: 1.0), Color(white: 0.95)],
+                    colors: [AppTheme.primary, AppTheme.bgMain],
                     startPoint: .top,
                     endPoint: .bottom
                 )

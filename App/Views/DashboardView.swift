@@ -173,7 +173,7 @@ struct DashboardView: View {
                     .padding(.horizontal)
                     .padding(.bottom, 24)
                 }
-                .padding(.bottom, 24)
+                .padding(.bottom, 120) // padding to clear floating tab bar
             }
             .ignoresSafeArea(edges: .top)
             .scrollContentBackground(.hidden)
