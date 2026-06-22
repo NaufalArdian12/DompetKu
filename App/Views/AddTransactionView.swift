@@ -9,12 +9,16 @@ struct AddTransactionView: View {
     @Environment(\.dismiss) private var dismiss
     
     @Query(sort: \TransactionCategory.name) private var allCategories: [TransactionCategory]
+    @Query(sort: \Wallet.name) private var wallets: [Wallet]
     
     @State private var amountString = ""
     @State private var selectedType: TransactionType = .expense
     @State private var selectedCategory = "Makanan"
+    @State private var selectedWalletId: UUID? = nil
     @State private var date = Date()
     @State private var note = ""
+    @State private var isRecurring = false
+    @State private var recurringFrequency: RecurringFrequency = .monthly
     @FocusState private var isAmountFocused: Bool
     
     var categories: [TransactionCategory] {
@@ -40,6 +44,7 @@ struct AddTransactionView: View {
                         transactionTypeSection
                         categorySection
                             .animation(.spring(response: 0.3, dampingFraction: 0.7), value: selectedType)
+                        walletSection
                         detailsSection
                     }
                     .padding(.vertical, 20)
@@ -63,6 +68,9 @@ struct AddTransactionView: View {
             }
             .onAppear {
                 isAmountFocused = true
+                if selectedWalletId == nil {
+                    selectedWalletId = wallets.first?.id
+                }
             }
         }
     }
@@ -178,6 +186,55 @@ struct AddTransactionView: View {
         .buttonStyle(.plain)
     }
     
+    private var walletSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Dompet / Rekening")
+                .font(.headline)
+                .foregroundStyle(.black)
+            
+            if !wallets.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 12) {
+                        ForEach(wallets) { wallet in
+                            walletButton(for: wallet)
+                        }
+                    }
+                }
+            }
+        }
+        .padding(.horizontal)
+    }
+    
+    private func walletButton(for wallet: Wallet) -> some View {
+        let isSelected = selectedWalletId == wallet.id || (selectedWalletId == nil && wallet.isDefault)
+        let wColor = Color(hex: wallet.colorHex) ?? AppTheme.primary
+        
+        return Button {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) {
+                selectedWalletId = wallet.id
+            }
+        } label: {
+            HStack(spacing: 8) {
+                Image(systemName: wallet.iconName)
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(isSelected ? .white : wColor)
+                
+                Text(wallet.name)
+                    .font(.subheadline.weight(isSelected ? .bold : .medium))
+                    .foregroundStyle(isSelected ? .white : .primary)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .background(isSelected ? wColor : wColor.opacity(0.1))
+            .clipShape(Capsule())
+            .overlay(
+                Capsule()
+                    .stroke(isSelected ? Color.clear : wColor.opacity(0.3), lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
+    }
+    
     private var detailsSection: some View {
         VStack(spacing: 16) {
             DatePicker("Tanggal", selection: $date, displayedComponents: [.date])
@@ -189,6 +246,26 @@ struct AddTransactionView: View {
                 Image(systemName: "note.text")
                     .foregroundStyle(AppTheme.primary)
                 TextField("Catatan tambahan...", text: $note)
+            }
+            
+            Divider()
+            
+            Toggle(isOn: $isRecurring.animation()) {
+                HStack {
+                    Image(systemName: "arrow.2.squarepath")
+                        .foregroundStyle(AppTheme.primary)
+                    Text("Jadikan Rutin")
+                }
+            }
+            
+            if isRecurring {
+                Picker("Frekuensi", selection: $recurringFrequency) {
+                    ForEach(RecurringFrequency.allCases, id: \.self) { freq in
+                        Text(freq.rawValue).tag(freq)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .padding(.top, 4)
             }
         }
         .padding()
@@ -250,10 +327,35 @@ struct AddTransactionView: View {
             type: selectedType,
             category: selectedCategory,
             date: date,
-            note: note.trimmingCharacters(in: .whitespacesAndNewlines)
+            note: note.trimmingCharacters(in: .whitespacesAndNewlines),
+            walletId: selectedWalletId
         )
         
         modelContext.insert(transaction)
+        
+        // Update wallet balance if a wallet is selected
+        if let wId = selectedWalletId, let wallet = wallets.first(where: { $0.id == wId }) {
+            if selectedType == .income {
+                wallet.initialBalance += amount
+            } else {
+                wallet.initialBalance -= amount
+            }
+        }
+        
+        // Save recurring transaction if toggled
+        if isRecurring {
+            let nextDate = recurringFrequency.nextDate(from: date)
+            let recurringTx = RecurringTransaction(
+                amount: amount,
+                type: selectedType,
+                category: selectedCategory,
+                walletId: selectedWalletId,
+                note: note.trimmingCharacters(in: .whitespacesAndNewlines),
+                frequency: recurringFrequency,
+                nextFireDate: nextDate
+            )
+            modelContext.insert(recurringTx)
+        }
         
         #if os(iOS)
         UINotificationFeedbackGenerator().notificationOccurred(.success)
