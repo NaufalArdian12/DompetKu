@@ -5,8 +5,11 @@ struct TransactionListView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \Transaction.date, order: .reverse) private var transactions: [Transaction]
     
+    @Query(sort: \Wallet.name) private var wallets: [Wallet]
+    
     @State private var searchText = ""
     @State private var selectedFilter: FilterType = .all
+    @State private var selectedWalletId: UUID? = nil
     @State private var transactionToDelete: Transaction?
     @State private var showingDeleteAlert = false
     
@@ -18,6 +21,9 @@ struct TransactionListView: View {
     
     var filteredTransactions: [Transaction] {
         transactions.filter { transaction in
+            // Wallet filter
+            let matchesWallet = selectedWalletId == nil || transaction.walletId == selectedWalletId
+            
             // Search text filter
             let matchesSearch = searchText.isEmpty || 
                 transaction.category.localizedCaseInsensitiveContains(searchText) || 
@@ -34,7 +40,7 @@ struct TransactionListView: View {
                 matchesType = transaction.type == .expense
             }
             
-            return matchesSearch && matchesType
+            return matchesWallet && matchesSearch && matchesType
         }
     }
     
@@ -48,6 +54,23 @@ struct TransactionListView: View {
                         .foregroundStyle(.black)
                         .padding(.horizontal)
                         .padding(.top, 24)
+                    
+                    // Wallet Selector
+                    if !wallets.isEmpty {
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 12) {
+                                walletPill(title: "Semua Dompet", icon: "square.stack.3d.up.fill", isSelected: selectedWalletId == nil) {
+                                    withAnimation { selectedWalletId = nil }
+                                }
+                                ForEach(wallets) { wallet in
+                                    walletPill(title: wallet.name, icon: wallet.iconName, isSelected: selectedWalletId == wallet.id) {
+                                        withAnimation { selectedWalletId = wallet.id }
+                                    }
+                                }
+                            }
+                            .padding(.horizontal)
+                        }
+                    }
                     
                     // Custom Search Bar
                     HStack(spacing: 8) {
@@ -115,5 +138,27 @@ struct TransactionListView: View {
                 Text("Apakah Anda yakin ingin menghapus transaksi \(transaction.category) senilai \(transaction.formattedAmount)?")
             }
         }
+    }
+    
+    private func walletPill(title: String, icon: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 6) {
+                Image(systemName: icon)
+                    .font(.system(size: 14))
+                Text(title)
+                    .font(.subheadline.weight(isSelected ? .bold : .medium))
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+            .background(isSelected ? AppTheme.primary : AppTheme.bgCard)
+            .foregroundStyle(isSelected ? .white : .primary)
+            .clipShape(Capsule())
+            .overlay(
+                Capsule()
+                    .stroke(isSelected ? Color.clear : Color.gray.opacity(0.3), lineWidth: 1)
+            )
+            .shadow(color: isSelected ? AppTheme.primary.opacity(0.3) : .clear, radius: 4, x: 0, y: 2)
+        }
+        .buttonStyle(.plain)
     }
 }

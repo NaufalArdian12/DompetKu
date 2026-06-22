@@ -12,25 +12,43 @@ struct DashboardView: View {
     @State private var transactionToDelete: Transaction?
     @State private var showingDeleteAlert = false
     
+    @Query(sort: \Wallet.name) private var wallets: [Wallet]
+    @State private var selectedWalletId: UUID? = nil // nil means "Semua"
+    
     @AppStorage("monthlyBudget") private var monthlyBudget: Double = 0.0
+    
+    private var filteredTransactions: [Transaction] {
+        if let selectedWalletId {
+            return transactions.filter { $0.walletId == selectedWalletId }
+        }
+        return transactions
+    }
     
     // Financial Calculations
     private var currentMonthExpense: Double {
         let calendar = Calendar.current
         let now = Date()
         let startOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: now)) ?? now
-        return transactions.filter { $0.type == .expense && $0.date >= startOfMonth }.reduce(0) { $0 + $1.amount }
+        return filteredTransactions.filter { $0.type == .expense && $0.date >= startOfMonth }.reduce(0) { $0 + $1.amount }
     }
     private var totalIncome: Double {
-        transactions.filter { $0.type == .income }.reduce(0) { $0 + $1.amount }
+        filteredTransactions.filter { $0.type == .income }.reduce(0) { $0 + $1.amount }
     }
     
     private var totalExpense: Double {
-        transactions.filter { $0.type == .expense }.reduce(0) { $0 + $1.amount }
+        filteredTransactions.filter { $0.type == .expense }.reduce(0) { $0 + $1.amount }
     }
     
     private var currentBalance: Double {
-        totalIncome - totalExpense
+        if let selectedWalletId, let wallet = wallets.first(where: { $0.id == selectedWalletId }) {
+            return wallet.initialBalance
+        }
+        // If "Semua", sum all initial balances
+        let baseBalance = wallets.reduce(0) { $0 + $1.initialBalance }
+        // If we want actual balance, should it be baseBalance?
+        // Wait, initialBalance is currently being updated in AddTransactionView as the current balance.
+        // So initialBalance is actually the running balance! Let's rename in mind to currentBalance.
+        return baseBalance
     }
     
     // Daily Summary logic for the 7-day SwiftChart
@@ -44,7 +62,7 @@ struct DashboardView: View {
                 let startOfDay = calendar.startOfDay(for: date)
                 let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay)!
                 
-                let dailyTransactions = transactions.filter { $0.date >= startOfDay && $0.date < endOfDay }
+                let dailyTransactions = filteredTransactions.filter { $0.date >= startOfDay && $0.date < endOfDay }
                 let dailyIncome = dailyTransactions.filter { $0.type == .income }.reduce(0) { $0 + $1.amount }
                 let dailyExpense = dailyTransactions.filter { $0.type == .expense }.reduce(0) { $0 + $1.amount }
                 
@@ -58,6 +76,9 @@ struct DashboardView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 20) {
+                    
+
+                    
                     BalanceCardView(
                         currentBalance: currentBalance,
                         totalIncome: totalIncome,
@@ -66,6 +87,25 @@ struct DashboardView: View {
                             showingAddSheet = true
                         }
                     )
+                    
+                    // Wallet Selector
+                    if !wallets.isEmpty {
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 12) {
+                                walletPill(title: "Semua Dompet", icon: "square.stack.3d.up.fill", isSelected: selectedWalletId == nil) {
+                                    withAnimation { selectedWalletId = nil }
+                                }
+                                ForEach(wallets) { wallet in
+                                    walletPill(title: wallet.name, icon: wallet.iconName, isSelected: selectedWalletId == wallet.id) {
+                                        withAnimation { selectedWalletId = wallet.id }
+                                    }
+                                }
+                            }
+                            .padding(.horizontal)
+                        }
+                        .padding(.top, 4)
+                        .padding(.bottom, 8)
+                    }
                     
                     // Budget Section
                     if monthlyBudget > 0 {
@@ -242,6 +282,28 @@ struct DashboardView: View {
                 Text("Apakah Anda yakin ingin menghapus transaksi \(transaction.category) senilai \(transaction.formattedAmount)?")
             }
         }
+    }
+    
+    private func walletPill(title: String, icon: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 6) {
+                Image(systemName: icon)
+                    .font(.system(size: 14))
+                Text(title)
+                    .font(.subheadline.weight(isSelected ? .bold : .medium))
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+            .background(isSelected ? AppTheme.primary : AppTheme.bgCard)
+            .foregroundStyle(isSelected ? .white : .primary)
+            .clipShape(Capsule())
+            .overlay(
+                Capsule()
+                    .stroke(isSelected ? Color.clear : Color.gray.opacity(0.3), lineWidth: 1)
+            )
+            .shadow(color: isSelected ? AppTheme.primary.opacity(0.3) : .clear, radius: 4, x: 0, y: 2)
+        }
+        .buttonStyle(.plain)
     }
 }
 
