@@ -9,14 +9,16 @@ final class Transaction {
     var category: String
     var date: Date
     var note: String
+    var walletId: UUID?
     
-    init(id: UUID = UUID(), amount: Double, type: TransactionType, category: String, date: Date = Date(), note: String = "") {
+    init(id: UUID = UUID(), amount: Double, type: TransactionType, category: String, date: Date = Date(), note: String = "", walletId: UUID? = nil) {
         self.id = id
         self.amount = amount
         self.typeString = type.rawValue
         self.category = category
         self.date = date
         self.note = note
+        self.walletId = walletId
     }
     
     @Transient
