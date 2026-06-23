@@ -73,9 +73,6 @@ App/
   Components/                       Komponen UI reusable
   Theme/                            Warna, gradient, icon, dan style shared
   Extensions/                       Helper extension
-docs/superpowers/
-  specs/                            Dokumen desain improvement
-  plans/                            Plan implementasi improvement
 Package.swift                       Swift Package manifest
 project.yml                         Konfigurasi XcodeGen
 Dompetku.xcodeproj                  Xcode project
